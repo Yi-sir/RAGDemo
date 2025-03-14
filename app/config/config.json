@@ -1,0 +1,17 @@
+{
+    "llm_config": {
+        "model": "qwen",
+        "path": "/home/xyz/LLM/",
+        "api_key": ""
+    },
+    "retrieval_config": {
+        "backend": "es"
+    },
+    "doc_config": {
+        "embedding_model": "bge",
+        "embedding_model_path": "/home/xyz/RAG/",
+        "split_method": "FixedLength",
+        "chunk_length": 512,
+        "overlay": 50
+    }
+}
