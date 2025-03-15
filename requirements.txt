@@ -2,5 +2,7 @@ FlagEmbedding
 transformers
 numpy
 torch
-faiss
+faiss-cpu
 openai
+pdfplumber
+docx==0.8.11

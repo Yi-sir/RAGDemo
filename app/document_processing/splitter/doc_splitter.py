@@ -1,27 +1,43 @@
 from abc import ABC, abstractmethod
-from typing import List, Dict
+from typing import List, Dict, Type
 
-from engine.config import DocConfig
-from splitter.fixed_len_splitter import FixedLengthSplitter
-from utils.logger import get_logger
+from app.engine.config import DocConfig
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-SPLITTERCLSMAP = {"FixedLength": FixedLengthSplitter}
-
 
 class DocSplitterBase(ABC):
+    
+    _subclasses: Dict[str, Type["DocSplitterBase"]] = {}
+    
     def __init__(self, config: DocConfig):
         self.method = config.split_method
         logger.info(f"Document split method: {self.method}")
+        
+    @classmethod
+    def register_subclass(cls, class_name, subclass: Type["DocSplitterBase"]):
+        """register a subclass"""
+        cls._subclasses[class_name] = subclass
 
     @abstractmethod
     def split_text(self, text: str) -> List[str]:
         raise NotImplementedError("split_text must be implemented in subclasses.")
 
     @classmethod
-    def from_config(cls, config):
-        splitter_cls = SPLITTERCLSMAP.get(config.split_method, None)
-        if splitter_cls == None:
-            raise NameError(f"No such method! Method name: {config.split_method}")
-        return splitter_cls(config)
+    def from_config(cls, config: DocConfig):
+        """create subclass instance from config
+
+        Args:
+            config (DocConfig): config
+
+        Raises:
+            ValueError: if invalid subclass name
+
+        Returns:
+            _type_: subclass instance
+        """
+        splitter_type = config.split_method
+        if splitter_type not in cls._subclasses:
+            raise ValueError(f"Unknown generator type: {splitter_type}")
+        return cls._subclasses[splitter_type](config)

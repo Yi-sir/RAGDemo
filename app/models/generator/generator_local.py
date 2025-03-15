@@ -2,13 +2,13 @@ import importlib
 from typing import Any, Dict
 
 import torch
-from generator import Generator, GeneratorConfig
+from app.models.generator.generator import Generator, GeneratorConfig
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-
+@Generator.register_subclass("Local")
 class GeneratorLocal(Generator):
     def __init__(self, config: GeneratorConfig = None):
         super().__init__(config)
@@ -57,3 +57,5 @@ class GeneratorLocal(Generator):
             )
 
         return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+Generator.register_subclass("LOCAL", GeneratorLocal)

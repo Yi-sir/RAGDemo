@@ -1,17 +1,17 @@
 import os
 from typing import List
 
-from engine.config import EmbeddingConfig
+from app.engine.config import DocConfig
 from FlagEmbedding import FlagAutoModel
-from utils.logger import get_logger
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
 class Embedder:
-    def __init__(self, config: EmbeddingConfig):
-        self.model_name = config.model
-        self.model_path = config.path
+    def __init__(self, config: DocConfig):
+        self.model_name = config.embedding_model
+        self.model_path = config.embedding_model_path
         if os.path.exists(self.model_path):
             logger.info(f"Offline loading, model path is {self.model_path}")
             self.model = FlagAutoModel.from_finetuned(

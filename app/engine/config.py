@@ -7,14 +7,10 @@ from typing import Optional
 @dataclass
 class GeneratorConfig:
     model: str
+    backend_type: str
     path: Optional[str] = None
     api_url: Optional[str] = None
     api_key: Optional[str] = None
-
-
-@dataclass
-class RetrievalConfig:
-    backend: str
 
 
 @dataclass
@@ -32,7 +28,6 @@ class DocConfig:
 @dataclass
 class RAGConfig:
     llm_config: GeneratorConfig
-    retrieval_config: RetrievalConfig
     doc_config: DocConfig
 
     @classmethod
@@ -51,6 +46,5 @@ class RAGConfig:
 
         return cls(
             llm_config=GeneratorConfig(**config_data["llm_config"]),
-            retrieval_config=RetrievalConfig(**config_data["retrieval_config"]),
             doc_config=DocConfig(**config_data["doc_config"]),
         )

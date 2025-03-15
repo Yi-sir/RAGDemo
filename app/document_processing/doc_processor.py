@@ -5,12 +5,12 @@ from typing import List, Union, Dict, Tuple
 import numpy as np
 import pdfplumber  # for PDF
 from docx import Document  # for DOCX
-from embedder import Embedder
-from engine.config import DocConfig
-from utils.logger import get_logger
+from app.document_processing.embedder import Embedder
+from app.engine.config import DocConfig
+from app.utils.logger import get_logger
 
-from RAG_demo.app.document_processing.database.database import DataBase
-from RAG_demo.app.document_processing.splitter.doc_splitter import \
+from app.document_processing.database.database import DataBase
+from app.document_processing.splitter.doc_splitter import \
     DocSplitterBase
 
 logger = get_logger(__name__)
@@ -112,7 +112,7 @@ class DocProcessor:
         chunks = self.splitter.split_text(text)
         self._update_doc_map(file_path, chunks)
         vectors = self.embedder.embed(chunks)
-        self.vector_store.add_vectors(file_path, vectors)
+        self.vector_store.add_vector(file_path, vectors)
         
     def remove_document(self, file_path: str):
         """remove a file

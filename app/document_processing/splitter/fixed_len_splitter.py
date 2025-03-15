@@ -1,8 +1,8 @@
 from typing import List
 
-from utils.logger import get_logger
+from app.utils.logger import get_logger
 
-from RAG_demo.app.document_processing.splitter.doc_splitter import \
+from app.document_processing.splitter.doc_splitter import \
     DocSplitterBase
 
 logger = get_logger(__name__)
@@ -30,3 +30,5 @@ class FixedLengthSplitter(DocSplitterBase):
             chunks.append(text[start:end])
             start = end - self.overlap
         return chunks
+
+DocSplitterBase.register_subclass("FixedLength", FixedLengthSplitter)

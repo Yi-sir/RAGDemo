@@ -1,10 +1,10 @@
 from typing import Dict
 
-from config import RAGConfig
-from models.generator.generator import Generator
-from utils.logger import get_logger
+from app.engine.config import RAGConfig
+from app.models.generator.generator import Generator
+from app.utils.logger import get_logger
 
-from RAG_demo.app.document_processing.doc_processor import DocProcessor
+from app.document_processing.doc_processor import DocProcessor
 
 logger = get_logger(__name__)
 
@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 class RAGEngine:
     def __init__(self, config: RAGConfig):
         self.generator = Generator.from_config(config.llm_config)
-        self.doc_processor = DocProcessor(config.emb_config)
+        self.doc_processor = DocProcessor(config.doc_config)
 
     def add_doc(self, file_path: str) -> bool:
         """add a document to rag system
@@ -59,6 +59,7 @@ class RAGEngine:
             context = ["\n".join(text) for _, text in results][0]
             
             # 这个接口是不是做成generate(context, question) ?
+            # 还有对话历史
             answer = self.generator.generate(context + results)
             return {
                 "answer": answer,
