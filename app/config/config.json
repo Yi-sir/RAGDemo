@@ -3,8 +3,8 @@
         "model": "spn3/Qwen2.5-72B-Instruct",
         "backend_type": "Api",
         "path": "",
-        "api_url": "https://www.sophnet.com/api/open-apis",
-        "api_key": "jSXTaSGj5A-HtBNAz3wOxu7FvI9ghbLuQANJiQNJEsq4c8-mrv3OHAxu1X3lz7JBFWxFweSGaseRKicjv207-Q"
+        "api_url": "your url",
+        "api_key": "your key"
     },
     "doc_config": {
         "embedding_model": "bge",
