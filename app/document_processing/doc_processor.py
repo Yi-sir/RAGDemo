@@ -106,6 +106,7 @@ class DocProcessor:
         if file_path in self.doc_chunk_map.keys():
             logger.error(f"Found file with the same name {file_path}")
             raise FileExistsError()
+        logger.info(f"Process new file {file_path}")
         text = load_document(file_path)
         text = clean_text(text)
         chunks = self.splitter.split_text(text)
@@ -113,6 +114,20 @@ class DocProcessor:
         vectors = self.embedder.embed(chunks)
         self.vector_store.add_vectors(file_path, vectors)
         
+    def remove_document(self, file_path: str):
+        """remove a file
+
+        Args:
+            file_path (str): filename
+        """
+        if not file_path in self.doc_chunk_map.keys():
+            logger.warning(f"Cannot found file with the same name {file_path}")
+            raise ValueError()
+        self.vector_store.remove_vectors(file_path)
+        self.doc_chunk_map.pop(file_path)
+        logger.info(f"File {file_path} is removed")
+        
+
     def search_ralated_chunk(self, text: str) -> List[Tuple[str, str]]:
         """search related chunks with input text
 
