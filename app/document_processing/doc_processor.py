@@ -58,7 +58,7 @@ def clean_text(text: str) -> str:
         str: cleaned text
     """
     text = re.sub(r"\s+", " ", text).strip()
-    text = re.sub(r"[^\w\s.,!?-~]", "", text)
+    # text = re.sub(r"[^\w\s.,!?-~]", "", text)
     return text
 
 

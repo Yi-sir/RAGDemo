@@ -3,8 +3,8 @@
         "model": "spn3/Qwen2.5-72B-Instruct",
         "backend_type": "Api",
         "path": "",
-        "api_url": "your url",
-        "api_key": "your key"
+        "api_url": "",
+        "api_key": ""
     },
     "doc_config": {
         "embedding_model": "bge",
