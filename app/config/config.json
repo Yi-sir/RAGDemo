@@ -4,7 +4,7 @@
         "backend_type": "Api",
         "path": "",
         "api_url": "https://www.sophnet.com/api/open-apis",
-        "api_key": "4vX94CDgSxwP2JOw9kuY0d"
+        "api_key": "jSXTaSGj5A-HtBNAz3wOxu7FvI9ghbLuQANJiQNJEsq4c8-mrv3OHAxu1X3lz7JBFWxFweSGaseRKicjv207-Q"
     },
     "doc_config": {
         "embedding_model": "bge",
@@ -14,6 +14,6 @@
         "overlap": 50,
         "database_method": "Faiss",
         "dimension": 512,
-        "topk": 5
+        "topk": 1
     }
 }

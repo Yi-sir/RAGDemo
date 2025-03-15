@@ -1,4 +1,5 @@
 from typing import Dict
+import os
 
 from app.engine.config import RAGConfig
 from app.models.generator.generator import Generator
@@ -23,12 +24,13 @@ class RAGEngine:
         Returns:
             whether is successfully added
         """
+        real_path = os.path.abspath(file_path)
         try:
-            self.doc_processor.process_document(file_path=file_path)
-            logger.info(f"Document added successfully: {file_path}")
+            self.doc_processor.process_document(file_path=real_path)
+            logger.info(f"Document added successfully: {real_path}")
             return True
         except:
-            logger.error(f"Failed to add document: {file_path}")
+            logger.error(f"Failed to add document: {real_path}")
             return False
         
     def remove_doc(self, file_path: str) -> bool:
@@ -40,12 +42,13 @@ class RAGEngine:
         Returns:
             bool: whether is successfully removed
         """
+        real_path = os.path.abspath(file_path)
         try:
-            self.doc_processor.remove_document(file_path)
-            logger.info(f"Document removed successfully: {file_path}")
+            self.doc_processor.remove_document(real_path)
+            logger.info(f"Document removed successfully: {real_path}")
             return True
         except:
-            logger.error(f"Failed to remove document: {file_path}")
+            logger.error(f"Failed to remove document: {real_path}")
             return False
         
     def query(self, question: str) -> Dict:
@@ -56,11 +59,11 @@ class RAGEngine:
         """
         try:
             results = self.doc_processor.search_ralated_chunk(question)
-            context = ["\n".join(text) for _, text in results][0]
-            
+            context = [tup[1] for tup in results]
+            context = "\n".join(context)
             # 这个接口是不是做成generate(context, question) ?
             # 还有对话历史
-            answer = self.generator.generate(context + results)
+            answer = self.generator.generate(context + question)
             return {
                 "answer": answer,
                 "reference": results

@@ -3,6 +3,6 @@ transformers
 numpy
 torch
 faiss-cpu
-openai
+OpenAI
 pdfplumber
 docx==0.8.11

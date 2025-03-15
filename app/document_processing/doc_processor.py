@@ -58,7 +58,7 @@ def clean_text(text: str) -> str:
         str: cleaned text
     """
     text = re.sub(r"\s+", " ", text).strip()
-    text = re.sub(r"[^\w\s.,!?]", "", text)
+    text = re.sub(r"[^\w\s.,!?-~]", "", text)
     return text
 
 
@@ -89,10 +89,10 @@ class DocProcessor:
             file_name (str): file name
             id (int): chunk id
         """
-        if not file_name in self.doc_chunk_map.keys():
+        if not file_name in self.doc_chunk_map:
             logger.error(f"Cannot find a file named {file_name} in dict.")
             raise FileNotFoundError()
-        if not id in self.doc_chunk_map[file_name].keys():
+        if not id in self.doc_chunk_map[file_name]:
             logger.error(f"Invalid chunk id, filename: {file_name}, chunk_id: {id}")
             raise IndexError()
         return self.doc_chunk_map[file_name][id]
@@ -103,7 +103,7 @@ class DocProcessor:
         Args:
             file_path (str): file path
         """
-        if file_path in self.doc_chunk_map.keys():
+        if file_path in self.doc_chunk_map:
             logger.error(f"Found file with the same name {file_path}")
             raise FileExistsError()
         logger.info(f"Process new file {file_path}")
@@ -120,7 +120,7 @@ class DocProcessor:
         Args:
             file_path (str): filename
         """
-        if not file_path in self.doc_chunk_map.keys():
+        if not file_path in self.doc_chunk_map:
             logger.warning(f"Cannot found file with the same name {file_path}")
             raise ValueError()
         self.vector_store.remove_vectors(file_path)
@@ -137,7 +137,7 @@ class DocProcessor:
         Returns:
             List[Tuple[str, str]]: List[Tuple(filename, chunk)]
         """
-        embedding = self.embedder.embed(text)
+        embedding = self.embedder.embed([text])
         res = self.vector_store.search(embedding) # (filename, chunk id, similarity)
         ret = []
         for (filename, chunk_id, _) in res:

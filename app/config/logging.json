@@ -16,13 +16,13 @@
     },
     "loggers": {
       "my_project": {
-        "level": "DEBUG",
+        "level": "INFO",
         "handlers": ["console"],
         "propagate": false
       }
     },
     "root": {
-      "level": "DEBUG",
+      "level": "INFO",
       "handlers": ["console"]
     }
   }
