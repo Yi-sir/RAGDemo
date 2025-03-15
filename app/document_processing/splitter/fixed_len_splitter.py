@@ -1,8 +1,12 @@
 from typing import List
-from document_processing.doc_splitter import DocSplitterBase
+
 from utils.logger import get_logger
 
+from RAG_demo.app.document_processing.splitter.doc_splitter import \
+    DocSplitterBase
+
 logger = get_logger(__name__)
+
 
 class FixedLengthSplitter(DocSplitterBase):
     def __init__(self, config):
@@ -11,12 +15,13 @@ class FixedLengthSplitter(DocSplitterBase):
         self.overlap = config.overlap
 
     def split_text(self, text: str) -> List[str]:
-        """
-        split text into chunks with fixed length
-        :param text: input text
-        :param chunk_size: number of characters in a chunk
-        :param overlap: number of overlapping characters between chunks
-        :return: list of chunks after splitting
+        """split text into chunks with fixed length
+        
+        Args:
+            text (str): input text
+        
+        Returns:
+            List[str]: list of chunks after splitting
         """
         chunks = []
         start = 0

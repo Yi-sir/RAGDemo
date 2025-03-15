@@ -8,6 +8,7 @@ from typing import Optional
 class GeneratorConfig:
     model: str
     path: Optional[str] = None
+    api_url: Optional[str] = None
     api_key: Optional[str] = None
 
 
@@ -23,6 +24,9 @@ class DocConfig:
     split_method: str
     chunk_length: int
     overlap: int
+    database_method: str
+    dimension: int
+    topk: int
 
 
 @dataclass

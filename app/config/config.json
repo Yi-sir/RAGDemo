@@ -2,6 +2,7 @@
     "llm_config": {
         "model": "qwen",
         "path": "/home/xyz/LLM/",
+        "api_url": "",
         "api_key": ""
     },
     "retrieval_config": {
@@ -12,6 +13,9 @@
         "embedding_model_path": "/home/xyz/RAG/",
         "split_method": "FixedLength",
         "chunk_length": 512,
-        "overlay": 50
+        "overlay": 50,
+        "database_method": "Faiss",
+        "dimension": 512,
+        "topk": 5
     }
 }

@@ -1,0 +1,6 @@
+FlagEmbedding
+transformers
+numpy
+torch
+faiss
+openai

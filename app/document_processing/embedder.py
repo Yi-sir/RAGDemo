@@ -2,9 +2,8 @@ import os
 from typing import List
 
 from engine.config import EmbeddingConfig
-from utils.logger import get_logger
-
 from FlagEmbedding import FlagAutoModel
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -28,6 +27,14 @@ class Embedder:
                 use_fp16=True,
             )
 
-    def embed(self, text: List[str]) -> List:
+    def embed(self, text: List[str]) -> List[List[float]]:
+        """calculate embedding of input text
+
+        Args:
+            text (List[str]): list of input text
+
+        Returns:
+            List: list of embeddings
+        """
         embeddings = self.model.encode(text)
-        return embeddings.tolist()
+        return embeddings
