@@ -143,3 +143,11 @@ class DocProcessor:
         for (filename, chunk_id, _) in res:
             ret.append((filename, self._get_chunk_by_name_and_id(filename, chunk_id)))
         return ret        
+
+    def get_doc_list(self) -> List[str]:
+        """get all documents stored in database
+
+        Returns:
+            List[str]: list of document name
+        """
+        return list(self.doc_chunk_map.keys())

@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 import os
 
 from app.engine.config import RAGConfig
@@ -24,13 +24,14 @@ class RAGEngine:
         Returns:
             whether is successfully added
         """
-        real_path = os.path.abspath(file_path)
+        # TODO: 是不是要支持一下List提交？
+        logger.info(f"Add document: {file_path}")
         try:
-            self.doc_processor.process_document(file_path=real_path)
-            logger.info(f"Document added successfully: {real_path}")
+            self.doc_processor.process_document(file_path)
+            logger.info(f"Document added successfully: {file_path}")
             return True
         except:
-            logger.error(f"Failed to add document: {real_path}")
+            logger.error(f"Failed to add document: {file_path}")
             return False
         
     def remove_doc(self, file_path: str) -> bool:
@@ -74,3 +75,20 @@ class RAGEngine:
                 "answer": None,
                 "reference": None
             }
+
+    def get_status(self) -> str:
+        """get status of service
+
+        Returns:
+            bool: True if alive, else False
+        """
+        
+        return {"status": "alive"}
+    
+    def get_doc_list(self) -> List[str]:
+        """get all documents stored in database
+
+        Returns:
+            List[str]: list of document name
+        """
+        return self.doc_processor.get_doc_list()
