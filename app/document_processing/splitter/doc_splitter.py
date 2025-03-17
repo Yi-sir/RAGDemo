@@ -1,8 +1,8 @@
-from abc import ABC, abstractmethod
-from typing import List, Dict, Type
+import importlib
 import os
 import sys
-import importlib
+from abc import ABC, abstractmethod
+from typing import Dict, List, Type
 
 from app.engine.config import DocConfig
 from app.utils.logger import get_logger
@@ -18,13 +18,13 @@ logger = get_logger(__name__)
 
 
 class DocSplitterBase(ABC):
-    
+
     _subclasses: Dict[str, Type["DocSplitterBase"]] = {}
-    
+
     def __init__(self, config: DocConfig):
         self.method = config.split_method
         logger.info(f"Document split method: {self.method}")
-        
+
     @classmethod
     def register_subclass(cls, class_name, subclass: Type["DocSplitterBase"]):
         """register a subclass"""
@@ -50,9 +50,13 @@ class DocSplitterBase(ABC):
         splitter_type = config.split_method.lower()
         if splitter_type not in DOCSPLITTER_CONFIG_MODULENAME_CLASSNAME_MAP:
             raise ValueError(f"Invalid generator backend type: {splitter_type}")
-        module_name, class_name = DOCSPLITTER_CONFIG_MODULENAME_CLASSNAME_MAP[splitter_type]
+        module_name, class_name = DOCSPLITTER_CONFIG_MODULENAME_CLASSNAME_MAP[
+            splitter_type
+        ]
         module = importlib.import_module(module_name)
         derived_class = getattr(module, class_name, None)
         if not derived_class or not issubclass(derived_class, cls):
-            raise ValueError(f"Class {class_name} not found or is not subclass of {cls}")
+            raise ValueError(
+                f"Class {class_name} not found or is not subclass of {cls}"
+            )
         return derived_class(config)

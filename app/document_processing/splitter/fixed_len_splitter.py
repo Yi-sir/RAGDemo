@@ -1,9 +1,7 @@
 from typing import List
 
+from app.document_processing.splitter.doc_splitter import DocSplitterBase
 from app.utils.logger import get_logger
-
-from app.document_processing.splitter.doc_splitter import \
-    DocSplitterBase
 
 logger = get_logger(__name__)
 
@@ -16,10 +14,10 @@ class FixedLengthSplitter(DocSplitterBase):
 
     def split_text(self, text: str) -> List[str]:
         """split text into chunks with fixed length
-        
+
         Args:
             text (str): input text
-        
+
         Returns:
             List[str]: list of chunks after splitting
         """

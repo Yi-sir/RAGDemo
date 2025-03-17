@@ -8,6 +8,7 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+
 class GeneratorLocal(Generator):
     def __init__(self, config: GeneratorConfig = None):
         super().__init__(config)
@@ -56,5 +57,6 @@ class GeneratorLocal(Generator):
             )
 
         return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
 
 Generator.register_subclass("LOCAL", GeneratorLocal)

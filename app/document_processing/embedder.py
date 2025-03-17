@@ -2,8 +2,9 @@ import os
 from typing import List
 
 from app.engine.config import DocConfig
-from FlagEmbedding import FlagAutoModel
 from app.utils.logger import get_logger
+
+from FlagEmbedding import FlagAutoModel
 
 logger = get_logger(__name__)
 

@@ -1,24 +1,22 @@
 import re
 from pathlib import Path
-from typing import List, Union, Dict, Tuple
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import pdfplumber  # for PDF
-from docx import Document  # for DOCX
+from app.document_processing.database.database import Database
 from app.document_processing.embedder import Embedder
+from app.document_processing.splitter.doc_splitter import DocSplitterBase
 from app.engine.config import DocConfig
 from app.utils.logger import get_logger
-
-from app.document_processing.database.database import Database
-from app.document_processing.splitter.doc_splitter import \
-    DocSplitterBase
+from docx import Document  # for DOCX
 
 logger = get_logger(__name__)
 
 
 def load_document(file_path: Union[str, Path]) -> str:
     """load and extract file
-    
+
     Args:
         file_path: file path
 
@@ -50,7 +48,7 @@ def load_document(file_path: Union[str, Path]) -> str:
 
 def clean_text(text: str) -> str:
     """clean text
-    
+
     Args:
         text: input text
 
@@ -71,7 +69,7 @@ class DocProcessor:
         self.embedder = Embedder(config)
         self.splitter = DocSplitterBase.from_config(config)
         self.vector_store = Database.from_config(config)
-        
+
     def _update_doc_map(self, file_path: str, chunks: List[str]):
         """record each chunk with id and filename
 
@@ -79,9 +77,10 @@ class DocProcessor:
             file_path (str): filename
             chunks (List[str]): chunks, splitted by splitter
         """
-        self.doc_chunk_map[file_path] = {index: text for index, text in enumerate(chunks)}
-        
-        
+        self.doc_chunk_map[file_path] = {
+            index: text for index, text in enumerate(chunks)
+        }
+
     def _get_chunk_by_name_and_id(self, file_name: str, id: int) -> str:
         """get a text chunk from map
 
@@ -99,7 +98,7 @@ class DocProcessor:
 
     def process_document(self, file_path: str):
         """process document and add to database
-        
+
         Args:
             file_path (str): file path
         """
@@ -113,7 +112,7 @@ class DocProcessor:
         self._update_doc_map(file_path, chunks)
         vectors = self.embedder.embed(chunks)
         self.vector_store.add_vector(file_path, vectors)
-        
+
     def remove_document(self, file_path: str):
         """remove a file
 
@@ -126,7 +125,6 @@ class DocProcessor:
         self.vector_store.remove_vectors(file_path)
         self.doc_chunk_map.pop(file_path)
         logger.info(f"File {file_path} is removed")
-        
 
     def search_ralated_chunk(self, text: str) -> List[Tuple[str, str]]:
         """search related chunks with input text
@@ -138,11 +136,11 @@ class DocProcessor:
             List[Tuple[str, str]]: List[Tuple(filename, chunk)]
         """
         embedding = self.embedder.embed([text])
-        res = self.vector_store.search(embedding) # (filename, chunk id, similarity)
+        res = self.vector_store.search(embedding)  # (filename, chunk id, similarity)
         ret = []
-        for (filename, chunk_id, _) in res:
+        for filename, chunk_id, _ in res:
             ret.append((filename, self._get_chunk_by_name_and_id(filename, chunk_id)))
-        return ret        
+        return ret
 
     def get_doc_list(self) -> List[str]:
         """get all documents stored in database

@@ -1,11 +1,10 @@
-from typing import Dict, List
 import os
+from typing import Dict, List
 
+from app.document_processing.doc_processor import DocProcessor
 from app.engine.config import RAGConfig
 from app.models.generator.generator import Generator
 from app.utils.logger import get_logger
-
-from app.document_processing.doc_processor import DocProcessor
 
 logger = get_logger(__name__)
 
@@ -20,7 +19,7 @@ class RAGEngine:
 
         Args:
             file_path (str): file path
-            
+
         Returns:
             whether is successfully added
         """
@@ -34,7 +33,7 @@ class RAGEngine:
         except:
             logger.error(f"Failed to add document: {real_path}")
             return False
-        
+
     def remove_doc(self, file_path: str) -> bool:
         """remove a document from rag system
 
@@ -53,7 +52,7 @@ class RAGEngine:
         except:
             logger.error(f"Failed to remove document: {real_path}")
             return False
-        
+
     def query(self, question: str) -> Dict:
         """generate answer to the question from user
 
@@ -67,16 +66,10 @@ class RAGEngine:
             # 这个接口是不是做成generate(context, question) ?
             # 还有对话历史
             answer = self.generator.generate(context + question)
-            return {
-                "answer": answer,
-                "reference": results
-            }
+            return {"answer": answer, "reference": results}
         except Exception as e:
             logger.error(f"Failed to generate answer: {e}")
-            return {
-                "answer": None,
-                "reference": None
-            }
+            return {"answer": None, "reference": None}
 
     def get_status(self) -> str:
         """get status of service
@@ -84,9 +77,9 @@ class RAGEngine:
         Returns:
             bool: True if alive, else False
         """
-        
+
         return {"status": "alive"}
-    
+
     def get_doc_list(self) -> List[str]:
         """get all documents stored in database
 

@@ -8,7 +8,7 @@ RAG_LOGGER_CONFIG_PATH = os.path.join(JSON_DIR, "logging.json")
 
 sys.path.append(BASE_DIR)
 
-from app.utils.logger import setup_logging, get_logger
+from app.utils.logger import get_logger, setup_logging
 
 if __name__ == "__main__":
     setup_logging(RAG_LOGGER_CONFIG_PATH)

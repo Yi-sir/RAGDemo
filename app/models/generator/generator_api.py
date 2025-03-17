@@ -1,11 +1,13 @@
+import os
+
 import openai
 from app.models.generator.generator import Generator, GeneratorConfig
 from app.utils.logger import get_logger
-import os
 
 logger = get_logger(__name__)
 
 RAG_GENERATOR_API_KEY_ENVIRON = "RAG_GENERATOR_API_KEY"
+
 
 class GeneratorApi(Generator):
     def __init__(self, config: GeneratorConfig):
@@ -21,15 +23,9 @@ class GeneratorApi(Generator):
         response = self.client.chat.completions.create(
             model=self.model_name,
             messages=[
-                {
-                    "role": "system",
-                    "content": "你是LLM智能助手"
-                },
-                {
-                    "role": "user",
-                    "content": prompt   
-                }
-            ]
+                {"role": "system", "content": "你是LLM智能助手"},
+                {"role": "user", "content": prompt},
+            ],
         )
 
         # 返回生成的文本

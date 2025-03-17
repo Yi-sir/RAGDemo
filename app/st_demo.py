@@ -1,7 +1,7 @@
-import streamlit as st
 import os
 import sys
 
+import streamlit as st
 from utils.logger import setup_logging
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -12,28 +12,32 @@ RAG_LOGGER_CONFIG_PATH = os.path.join(JSON_DIR, "logging.json")
 sys.path.append(BASE_DIR)
 setup_logging(RAG_LOGGER_CONFIG_PATH)
 
-from app.engine.rag_engine import RAGEngine
 from app.engine.config import RAGConfig
+from app.engine.rag_engine import RAGEngine
 
 if __name__ == "__main__":
-    
+
     # 页面标题
     st.title("RAG Demo")
 
     # 初始化会话状态
     if "rag_engine" not in st.session_state:
-        st.session_state.rag_engine = RAGEngine(config=RAGConfig.from_json(RAG_ENGINE_CONFIG_PATH))
+        st.session_state.rag_engine = RAGEngine(
+            config=RAGConfig.from_json(RAG_ENGINE_CONFIG_PATH)
+        )
 
     # 文件上传功能
     st.header("选择文档")
-    uploaded_file = st.file_uploader("选择一个文档（支持 PDF、DOCX、TXT 等格式）", type=["pdf", "docx", "txt"])
+    uploaded_file = st.file_uploader(
+        "选择一个文档（支持 PDF、DOCX、TXT 等格式）", type=["pdf", "docx", "txt"]
+    )
     submitted = st.button("上传")
     if uploaded_file is not None and submitted:
         # 保存上传的文件到临时路径
         file_path = f"/tmp/{uploaded_file.name}"
         with open(file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
-        
+
         # 添加文档到 RAG 系统
         if st.session_state.rag_engine.add_doc(file_path):
             st.success(f"文档 '{uploaded_file.name}' 添加成功！")
