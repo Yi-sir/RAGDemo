@@ -3,7 +3,7 @@
         "model": "spn3/Qwen2.5-72B-Instruct",
         "backend_type": "Api",
         "path": "",
-        "api_url": "https://www.sophnet.com/api/open-apis",
+        "api_url": "http://localhost:8090/v1",
         "api_key": ""
     },
     "doc_config": {

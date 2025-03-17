@@ -29,3 +29,16 @@ class GeneratorApi(Generator):
         )
 
         return response.choices[0].message.content
+
+    def generate_stream(self, prompt: str, **kwargs) -> str:
+        # generation_config = {**self.config, **kwargs}
+        stream = self.client.chat.completions.create(
+            model=self.model_name,
+            messages=[
+                {"role": "system", "content": "你是LLM智能助手"},
+                {"role": "user", "content": prompt},
+            ],
+            stream=True
+        )
+
+        return stream

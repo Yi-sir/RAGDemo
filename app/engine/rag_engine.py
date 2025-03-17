@@ -71,6 +71,14 @@ class RAGEngine:
         except Exception as e:
             logger.error(f"Failed to generate answer: {e}")
             return {"answer": None, "reference": None}
+        
+    def query_stream(self, question: str):
+        """generate answer to question from user, in stream mode
+
+        Args:
+            question (str): user question
+        """
+        raise NotImplementedError()
 
     def get_status(self) -> str:
         """get status of service
