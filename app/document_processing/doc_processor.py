@@ -38,7 +38,7 @@ def load_document(file_path: Union[str, Path]) -> str:
     elif file_path.suffix == ".docx":
         doc = Document(file_path)
         text = "\n".join(p.text for p in doc.paragraphs)
-    elif file_path.suffix == ".txt":
+    elif file_path.suffix == ".txt" or file_path.suffix == ".md":
         with open(file_path, "r", encoding="utf-8") as f:
             text = f.read()
     else:

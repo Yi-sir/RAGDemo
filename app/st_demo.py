@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     st.header("选择文档")
     uploaded_file = st.file_uploader(
-        "选择一个文档（支持 PDF、DOCX、TXT 等格式）", type=["pdf", "docx", "txt"]
+        "选择一个文档（支持 PDF、DOCX、TXT 等格式）", type=["pdf", "docx", "txt", "md"]
     )
     submitted = st.button("上传")
     if uploaded_file is not None and submitted:
@@ -79,3 +79,8 @@ if __name__ == "__main__":
                     st.error(f"文档 '{selected_document}' 删除失败！")
         else:
             st.info("当前没有加载的文档。")
+
+        st.header("参数配置")
+        topk = st.number_input("设置最大参考数量", min_value=1, max_value=128, value=5, step=1)
+        if topk:
+            st.session_state.rag_engine.update_topk(topk)
