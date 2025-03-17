@@ -14,9 +14,6 @@ setup_logging(RAG_LOGGER_CONFIG_PATH)
 
 from app.engine.rag_engine import RAGEngine
 from app.engine.config import RAGConfig
-from app.models.generator.generator_api import GeneratorAPI
-from app.document_processing.database.database_faiss import DataBaseFaiss
-from app.document_processing.splitter.fixed_len_splitter import FixedLengthSplitter
 
 if __name__ == "__main__":
     
