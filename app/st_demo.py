@@ -40,35 +40,42 @@ if __name__ == "__main__":
             st.error(f"文档 '{uploaded_file.name}' 添加失败！")
 
     st.header("问答")
-    question = st.text_input("请输入您的问题：")
-    if st.button("提交"):
-        if question:
-            with st.spinner("正在生成答案..."):
-                result = st.session_state.rag_engine.query(question)
-                if result["answer"]:
-                    st.success("答案：")
-                    st.write(result["answer"])
-                    if result["reference"]:
-                        st.info("参考文档：")
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    if prompt := st.chat_input("请输入您的问题："):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        with st.chat_message("assistant"):
+            result = st.session_state.rag_engine.query(prompt)
+            if result["answer"]:
+                st.write(result["answer"])
+                if result["reference"]:
+                    with st.expander("参考文档"):
                         for ref in result["reference"]:
-                            st.write(ref)
-                else:
-                    st.error("无法生成答案，请稍后重试。")
-        else:
-            st.warning("请输入问题！")
-
-    st.header("系统状态")
-    status = st.session_state.rag_engine.get_status()
-    st.json(status)
-
-    st.header("删除文档")
-    document_list = st.session_state.rag_engine.get_doc_list()
-    if document_list:
-        selected_document = st.selectbox("选择要删除的文档", document_list)
-        if st.button("删除"):
-            if st.session_state.rag_engine.remove_doc(selected_document):
-                st.success(f"文档 '{selected_document}' 删除成功！")
+                            st.info(f"参考文件名: {ref[0]}")
+                            st.write(f"相关内容: {ref[1]}")
+                st.session_state.messages.append({"role": "assistant", "content": result["answer"]})
             else:
-                st.error(f"文档 '{selected_document}' 删除失败！")
-    else:
-        st.info("当前没有加载的文档。")
+                st.error("无法生成答案，请稍后重试。")
+
+    with st.sidebar:
+        st.header("系统状态")
+        status = st.session_state.rag_engine.get_status()
+        st.json(status)
+
+        st.header("删除文档")
+        document_list = st.session_state.rag_engine.get_doc_list()
+        if document_list:
+            selected_document = st.selectbox("选择要删除的文档", document_list)
+            if st.button("删除"):
+                if st.session_state.rag_engine.remove_doc(selected_document):
+                    st.success(f"文档 '{selected_document}' 删除成功！")
+                else:
+                    st.error(f"文档 '{selected_document}' 删除失败！")
+        else:
+            st.info("当前没有加载的文档。")

@@ -152,3 +152,11 @@ class DocProcessor:
             List[str]: list of document name
         """
         return list(self.doc_chunk_map.keys())
+    
+    def update_topk(self, topk: int):
+        """update topk param while retrieval
+
+        Args:
+            topk (int): _description_
+        """
+        self.vector_store.update_topk(topk)

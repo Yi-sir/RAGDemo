@@ -96,3 +96,11 @@ class RAGEngine:
             List[str]: list of document name
         """
         return self.doc_processor.get_doc_list()
+
+    def update_topk(self, topk: int):
+        """update topk param while retrieval
+
+        Args:
+            topk (int): _description_
+        """
+        self.doc_processor.update_topk(topk)
