@@ -53,3 +53,7 @@ streamlit run ./app/st_demo.py
 | database_method | "faiss" | `embedding`向量搜索的方式 |
 | dimension | - | `embedding`向量长度 |
 | topk | - | 搜索相关文本块时结果的最大数量 |
+
+## 说明
+
+对于本地部署`VLLM`、`TGI`等`LLM`框架，本项目通过API调用推理接口的情况：`backend_type`设置为`api`，`api_url`设置为`http://localhost:port/v1`，`api_key`置空即可。

@@ -1,3 +1,4 @@
+import os
 import re
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
@@ -95,7 +96,7 @@ class DocProcessor:
             logger.error(f"Invalid chunk id, filename: {file_name}, chunk_id: {id}")
             raise IndexError()
         return self.doc_chunk_map[file_name][id]
-
+    
     def process_document(self, file_path: str):
         """process document and add to database
 
@@ -124,6 +125,8 @@ class DocProcessor:
             raise ValueError()
         self.vector_store.remove_vectors(file_path)
         self.doc_chunk_map.pop(file_path)
+        if file_path.startswith("/tmp"):
+            os.remove(file_path)
         logger.info(f"File {file_path} is removed")
 
     def search_ralated_chunk(self, text: str) -> List[Tuple[str, str]]:
