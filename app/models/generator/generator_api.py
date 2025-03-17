@@ -4,8 +4,7 @@ from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-@Generator.register_subclass("Api")
-class GeneratorAPI(Generator):
+class GeneratorApi(Generator):
     def __init__(self, config: GeneratorConfig):
         super().__init__(config)
         self.client = openai.OpenAI(api_key=config.api_key, base_url=config.api_url)

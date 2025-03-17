@@ -1,12 +1,20 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional, Type, Dict
-
+import importlib
+import os
+import sys
 from app.engine.config import GeneratorConfig
+
+GENERATOR_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(GENERATOR_DIR)
+
+GENERATOR_CONFIG_MODULENAME_CLASSNAME_MAP = {
+    "api": ("generator_api", "GeneratorApi"),
+    "local": ("generator_local", "GeneratorLocal")
+}
 
 
 class Generator(ABC):
-    
-    _subclasses: Dict[str, Type["Generator"]] = {}
     
     def __init__(self, config: GeneratorConfig = None):
         """
@@ -24,15 +32,6 @@ class Generator(ABC):
         if "max_tokens" in config and config["max_tokens"] <= 0:
             raise ValueError("Max tokens must be a positive integer")
         
-        
-    @classmethod
-    def register_subclass(cls, class_name):
-        """register a subclass"""
-        def decorator(subclass: Type["Generator"]):
-            cls._subclasses[class_name] = subclass
-            return subclass
-        return decorator
-
     @abstractmethod
     def generate(self, prompt: str, **kwargs) -> str:
         """
@@ -59,7 +58,12 @@ class Generator(ABC):
         Returns:
             _type_: subclass instance
         """
-        generator_type = config.backend_type
-        if generator_type not in cls._subclasses:
-            raise ValueError(f"Unknown generator type: {generator_type}")
-        return cls._subclasses[generator_type](config)
+        generator_type = config.backend_type.lower()
+        if generator_type not in GENERATOR_CONFIG_MODULENAME_CLASSNAME_MAP:
+            raise ValueError(f"Invalid generator backend type: {generator_type}")
+        module_name, class_name = GENERATOR_CONFIG_MODULENAME_CLASSNAME_MAP[generator_type]
+        module = importlib.import_module(module_name)
+        derived_class = getattr(module, class_name, None)
+        if not derived_class or not issubclass(derived_class, cls):
+            raise ValueError(f"Class {class_name} not found or is not subclass of {cls}")
+        return derived_class(config)

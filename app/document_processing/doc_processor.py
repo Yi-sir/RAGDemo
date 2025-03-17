@@ -9,7 +9,7 @@ from app.document_processing.embedder import Embedder
 from app.engine.config import DocConfig
 from app.utils.logger import get_logger
 
-from app.document_processing.database.database import DataBase
+from app.document_processing.database.database import Database
 from app.document_processing.splitter.doc_splitter import \
     DocSplitterBase
 
@@ -70,7 +70,7 @@ class DocProcessor:
         self.doc_chunk_map: Dict[str, Dict[int, str]] = {}
         self.embedder = Embedder(config)
         self.splitter = DocSplitterBase.from_config(config)
-        self.vector_store = DataBase.from_config(config)
+        self.vector_store = Database.from_config(config)
         
     def _update_doc_map(self, file_path: str, chunks: List[str]):
         """record each chunk with id and filename

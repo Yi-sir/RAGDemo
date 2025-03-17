@@ -8,7 +8,6 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-@Generator.register_subclass("Local")
 class GeneratorLocal(Generator):
     def __init__(self, config: GeneratorConfig = None):
         super().__init__(config)

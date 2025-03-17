@@ -1,8 +1,18 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, Type
+import os
+import sys
+import importlib
 
 from app.engine.config import DocConfig
 from app.utils.logger import get_logger
+
+DOCSPLITTER_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(DOCSPLITTER_DIR)
+
+DOCSPLITTER_CONFIG_MODULENAME_CLASSNAME_MAP = {
+    "fixedlength": ("fixed_len_splitter", "FixedLengthSplitter")
+}
 
 logger = get_logger(__name__)
 
@@ -37,7 +47,12 @@ class DocSplitterBase(ABC):
         Returns:
             _type_: subclass instance
         """
-        splitter_type = config.split_method
-        if splitter_type not in cls._subclasses:
-            raise ValueError(f"Unknown generator type: {splitter_type}")
-        return cls._subclasses[splitter_type](config)
+        splitter_type = config.split_method.lower()
+        if splitter_type not in DOCSPLITTER_CONFIG_MODULENAME_CLASSNAME_MAP:
+            raise ValueError(f"Invalid generator backend type: {splitter_type}")
+        module_name, class_name = DOCSPLITTER_CONFIG_MODULENAME_CLASSNAME_MAP[splitter_type]
+        module = importlib.import_module(module_name)
+        derived_class = getattr(module, class_name, None)
+        if not derived_class or not issubclass(derived_class, cls):
+            raise ValueError(f"Class {class_name} not found or is not subclass of {cls}")
+        return derived_class(config)

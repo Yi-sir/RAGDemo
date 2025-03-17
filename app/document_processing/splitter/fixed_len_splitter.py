@@ -30,5 +30,3 @@ class FixedLengthSplitter(DocSplitterBase):
             chunks.append(text[start:end])
             start = end - self.overlap
         return chunks
-
-DocSplitterBase.register_subclass("FixedLength", FixedLengthSplitter)

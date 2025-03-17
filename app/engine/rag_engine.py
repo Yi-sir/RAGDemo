@@ -25,13 +25,14 @@ class RAGEngine:
             whether is successfully added
         """
         # TODO: 是不是要支持一下List提交？
-        logger.info(f"Add document: {file_path}")
+        real_path = os.path.abspath(file_path)
+        logger.info(f"Add document: {real_path}")
         try:
-            self.doc_processor.process_document(file_path)
-            logger.info(f"Document added successfully: {file_path}")
+            self.doc_processor.process_document(real_path)
+            logger.info(f"Document added successfully: {real_path}")
             return True
         except:
-            logger.error(f"Failed to add document: {file_path}")
+            logger.error(f"Failed to add document: {real_path}")
             return False
         
     def remove_doc(self, file_path: str) -> bool:
@@ -44,6 +45,7 @@ class RAGEngine:
             bool: whether is successfully removed
         """
         real_path = os.path.abspath(file_path)
+        logger.info(f"Remove document: {real_path}")
         try:
             self.doc_processor.remove_document(real_path)
             logger.info(f"Document removed successfully: {real_path}")

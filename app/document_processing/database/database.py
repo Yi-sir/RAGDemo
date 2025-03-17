@@ -1,25 +1,28 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Type, Dict
 import numpy as np
+import os
+import sys
+import importlib
 from app.engine.config import DocConfig
 from app.utils.logger import get_logger
+
+DATABASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(DATABASE_DIR)
+
+DATABASE_CONFIG_MODULENAME_CLASSNAME_MAP = {
+    "faiss": ("database_faiss", "DatabaseFaiss")
+}
 
 logger = get_logger(__name__)
 
 
-class DataBase(ABC):
-    
-    _subclasses: Dict[str, Type["DataBase"]] = {}
+class Database(ABC):
     
     def __init__(self, config: DocConfig):
         self.dimension = config.dimension
         self.topk = config.topk
         self.index_map = {}
-
-    @classmethod
-    def register_subclass(cls, class_name, subclass: Type["DataBase"]):
-        """register a subclass"""
-        cls._subclasses[class_name] = subclass
     
     @abstractmethod
     def add_vector(self, filename: str, vectors: np.array):
@@ -59,10 +62,15 @@ class DataBase(ABC):
         Returns:
             _type_: subclass instance
         """
-        cls_type = config.database_method
-        if cls_type not in cls._subclasses:
-            raise ValueError(f"Unknown database type: {cls_type}")
-        return cls._subclasses[cls_type](config)
+        database_method = config.database_method.lower()
+        if database_method not in DATABASE_CONFIG_MODULENAME_CLASSNAME_MAP:
+            raise ValueError(f"Invalid generator backend type: {database_method}")
+        module_name, class_name = DATABASE_CONFIG_MODULENAME_CLASSNAME_MAP[database_method]
+        module = importlib.import_module(module_name)
+        derived_class = getattr(module, class_name, None)
+        if not derived_class or not issubclass(derived_class, cls):
+            raise ValueError(f"Class {class_name} not found or is not subclass of {cls}")
+        return derived_class(config)
     
     def remove_vectors(self, filename: str):
         """remove vectors by filename

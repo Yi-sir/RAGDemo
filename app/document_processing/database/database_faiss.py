@@ -5,12 +5,12 @@ import numpy as np
 from app.engine.config import DocConfig
 from app.utils.logger import get_logger
 
-from app.document_processing.database.database import DataBase
+from app.document_processing.database.database import Database
 
 logger = get_logger(__name__)
 
 
-class DataBaseFaiss(DataBase):
+class DatabaseFaiss(Database):
     def __init__(self, config: DocConfig):
         super().__init__(config)
 
@@ -38,4 +38,3 @@ class DataBaseFaiss(DataBase):
             global_results.sort(key=lambda x: x[2])
         return global_results[: min(self.topk, len(global_results))]
     
-DataBase.register_subclass("Faiss", DataBaseFaiss)
