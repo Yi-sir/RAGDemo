@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional, Type
 
 from app.engine.config import GeneratorConfig
+from app.utils.logger import get_logger
 
 GENERATOR_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(GENERATOR_DIR)
@@ -13,6 +14,8 @@ GENERATOR_CONFIG_MODULENAME_CLASSNAME_MAP = {
     "api": ("generator_api", "GeneratorApi"),
     "local": ("generator_local", "GeneratorLocal"),
 }
+
+logger = get_logger(__name__)
 
 
 class Generator(ABC):
@@ -25,6 +28,14 @@ class Generator(ABC):
         """
         self.model_name = config.model
         self.config = config
+        if self.config.backend_type.lower() == "local":
+            self.model_path = os.path.join(self.config.path, self.config.model)
+            if not os.path.exists(self.model_path):
+                logger.info(
+                    f"Model path {self.model_path} does not exist, \
+                    model {self.model_name} will be downloaded from cloud."
+                )
+                self.model_path = self.model_name
         # self._validate_config(self.config)
 
     def _validate_config(self, config):

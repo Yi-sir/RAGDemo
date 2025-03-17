@@ -13,6 +13,7 @@ class RAGEngine:
     def __init__(self, config: RAGConfig):
         self.generator = Generator.from_config(config.llm_config)
         self.doc_processor = DocProcessor(config.doc_config)
+        logger.info(f"RAGEngine is initialized with config {config}")
 
     def add_doc(self, file_path: str) -> bool:
         """add a document to rag system

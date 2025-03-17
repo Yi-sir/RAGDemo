@@ -2,17 +2,13 @@
 
 简易的RAG Demo，适合个人部署使用。目前支持了上传文档、问答、删除文档等功能。
 
-文档切块：定长
+## 使用方法
 
-搜索：Faiss
-
-推理：本地推理（transformers）或调用API
-
-embedding：FlagEmbedding
-
-web页面：streamlit
-
-后续上述功能都将支持更多的后端。
+```shell
+# 注意，默认的配置文件使用api调用llm，使用本地权重调用embedding model。使用前可以根据实际状况修改
+pip install -r requirements.txt
+streamlit run ./app/st_demo.py
+```
 
 ## 参考配置
 

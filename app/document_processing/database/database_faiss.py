@@ -30,7 +30,7 @@ class DatabaseFaiss(Database):
         global_results = []
 
         for filename, index in self.index_map.items():
-            num = self.topk if self.topk > index.ntotal else index.ntotal
+            num = index.ntotal if index.ntotal < self.topk else self.topk
             distances, indices = index.search(query_vector, num)
             for i, idx in enumerate(indices[0]):
                 global_results.append((filename, idx, distances[0][i]))

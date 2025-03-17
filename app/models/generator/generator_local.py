@@ -7,6 +7,7 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+
 def is_module_available(module_name: str):
     try:
         module = importlib.import_module(module_name, None)
@@ -21,15 +22,16 @@ class GeneratorLocal(Generator):
         super().__init__(config)
         if is_module_available("vllm"):
             self.backend = "vllm"
-            self._init_vllm(config)
+            self._init_vllm()
         elif is_module_available("transformers"):
             self.backend = "transformers"
-            self._init_transformers(config)
+            self._init_transformers()
         else:
-            logger.info("No available local generation framework, please use GeneratorApi")
+            logger.info(
+                "No available local generation framework, please use GeneratorApi"
+            )
 
-
-    def _init_vllm(self, config: GeneratorConfig):
+    def _init_vllm(self):
         """init vllm backend if vllm is available
 
         Args:
@@ -37,11 +39,11 @@ class GeneratorLocal(Generator):
         """
         logger.info("Using vllm as local generation backend")
         from vllm import LLM, SamplingParams
+
         self.vllm_sampling_params = SamplingParams(temperature=0.8, top_p=0.95)
-        self.model = LLM(model=config.path)
+        self.model = LLM(model=self.model_path)
 
-
-    def _init_transformers(self, config: GeneratorConfig):
+    def _init_transformers(self):
         """init transformers if transformers is available
 
         Args:
@@ -49,21 +51,22 @@ class GeneratorLocal(Generator):
         """
         logger.info("Using transformers as local generation backend")
         from transformers import AutoModelForCausalLM, AutoTokenizer
+
         try:
             module = importlib.import_module("torch_tpu")
             logger.info("found torch_tpu")
             self.device = "tpu" if torch.tpu.is_available() else "cpu"
         except ModuleNotFoundError:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        self.model = AutoModelForCausalLM.from_pretrained(self.model_name).to(
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
+        self.model = AutoModelForCausalLM.from_pretrained(self.model_path).to(
             self.device
         )
-        
+
     def _generate_vllm(self, prompt: str, **kwargs) -> str:
         outputs = self.model.generate(prompt, self.vllm_sampling_params)
         return outputs.output[0].text
-    
+
     def _generate_transformers(self, prompt: str, **kwargs) -> str:
         generation_config = self.make_generation_config(**kwargs)
 
@@ -74,7 +77,7 @@ class GeneratorLocal(Generator):
                 inputs.input_ids,
                 max_length=generation_config.get("max_tokens", 512),
                 temperature=generation_config.get("temperature", 1.0),
-                **generation_config
+                **generation_config,
             )
 
         return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
