@@ -28,5 +28,4 @@ class GeneratorApi(Generator):
             ],
         )
 
-        # 返回生成的文本
         return response.choices[0].message.content
