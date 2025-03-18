@@ -10,7 +10,7 @@
         "embedding_model": "bge",
         "embedding_model_path": "/home/xyz/RAG/bge-small-zh",
         "split_method": "FixedLength",
-        "chunk_length": 512,
+        "chunk_length": 256,
         "overlap": 50,
         "database_method": "Faiss",
         "dimension": 512,

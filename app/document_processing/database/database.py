@@ -84,7 +84,7 @@ class Database(ABC):
             filename (str): filename
         """
         self.index_map.pop(filename)
-        
+
     def update_topk(self, topk: int):
         """update topk param while retrieval
 

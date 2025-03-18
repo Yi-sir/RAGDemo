@@ -15,13 +15,57 @@ setup_logging(RAG_LOGGER_CONFIG_PATH)
 from app.engine.config import RAGConfig
 from app.engine.rag_engine import RAGEngine
 
+
+def query(prompt: str):
+    result = st.session_state.rag_engine.query(prompt)
+    if result["answer"]:
+        st.write(result["answer"])
+        if result["reference"]:
+            with st.expander("参考文档"):
+                for ref in result["reference"]:
+                    st.info(f"参考文件名: {ref[0]}")
+                    st.write(f"相关内容: {ref[1]}")
+        st.session_state.messages.append(
+            {"role": "assistant", "content": result["answer"]}
+        )
+    else:
+        st.error("无法生成答案，请稍后重试。")
+
+
+def query_stream(prompt: str):
+    result_stream = st.session_state.rag_engine.query_stream(prompt)
+    answer_placeholder = st.empty()
+    full_answer = ""
+    try:
+        for partial_result in result_stream:
+            if partial_result["answer"] is not None:
+                full_answer += partial_result["answer"]
+                answer_placeholder.write(full_answer)
+            else:
+                st.error("无法生成答案，请稍后重试。")
+                break
+
+        if full_answer and partial_result["reference"]:
+            with st.expander("参考文档"):
+                for ref in partial_result["reference"]:
+                    st.info(f"参考文件名: {ref[0]}")
+                    st.write(f"相关内容: {ref[1]}")
+        st.session_state.messages.append({"role": "assistant", "content": full_answer})
+    except Exception as e:
+        st.error(f"生成答案时发生错误: {e}")
+
+
 if __name__ == "__main__":
 
     st.title("RAG Demo")
 
     if "rag_engine" not in st.session_state:
-        st.session_state.rag_engine = RAGEngine(
-            config=RAGConfig.from_json(RAG_ENGINE_CONFIG_PATH)
+        st.session_state.rag_config = RAGConfig.from_json(RAG_ENGINE_CONFIG_PATH)
+        st.session_state.rag_engine = RAGEngine(st.session_state.rag_config)
+        query_func = (
+            query_stream
+            if st.session_state.rag_engine.check_query_stream_support()
+            else query
         )
 
     st.header("选择文档")
@@ -51,17 +95,7 @@ if __name__ == "__main__":
         with st.chat_message("user"):
             st.markdown(prompt)
         with st.chat_message("assistant"):
-            result = st.session_state.rag_engine.query(prompt)
-            if result["answer"]:
-                st.write(result["answer"])
-                if result["reference"]:
-                    with st.expander("参考文档"):
-                        for ref in result["reference"]:
-                            st.info(f"参考文件名: {ref[0]}")
-                            st.write(f"相关内容: {ref[1]}")
-                st.session_state.messages.append({"role": "assistant", "content": result["answer"]})
-            else:
-                st.error("无法生成答案，请稍后重试。")
+            query_func(prompt)
 
     with st.sidebar:
         st.header("系统状态")
@@ -81,6 +115,12 @@ if __name__ == "__main__":
             st.info("当前没有加载的文档。")
 
         st.header("参数配置")
-        topk = st.number_input("设置最大参考数量", min_value=1, max_value=128, value=5, step=1)
+        topk = st.number_input(
+            "设置最大参考数量",
+            min_value=1,
+            max_value=128,
+            value=st.session_state.rag_config.doc_config.topk,
+            step=1,
+        )
         if topk:
             st.session_state.rag_engine.update_topk(topk)

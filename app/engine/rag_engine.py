@@ -66,19 +66,46 @@ class RAGEngine:
             context = "\n".join(context)
             # 这个接口是不是做成generate(context, question) ?
             # 还有对话历史
-            answer = self.generator.generate(context + question)
+            answer = self.generator.generate(
+                context
+                + "以上是检索到的参考文本，请根据检索结果回答以下问题\n"
+                + question
+            )
             return {"answer": answer, "reference": results}
         except Exception as e:
             logger.error(f"Failed to generate answer: {e}")
             return {"answer": None, "reference": None}
-        
+
+    def check_query_stream_support(self) -> bool:
+        """check if llm backend supports generate stream
+
+        Returns:
+            bool: support or not
+        """
+        return self.generator.check_query_stream_support()
+
     def query_stream(self, question: str):
         """generate answer to question from user, in stream mode
 
         Args:
             question (str): user question
         """
-        raise NotImplementedError()
+        try:
+            results = self.doc_processor.search_ralated_chunk(question)
+            context = [tup[1] for tup in results]
+            context = "\n".join(context)
+            stream = self.generator.generate_stream(
+                context
+                + "以上是检索到的参考文本，请根据检索结果回答以下问题\n"
+                + question
+            )
+            for chunk in stream:
+                partial_answer = chunk.choices[0].delta.content
+                if partial_answer is not None:
+                    yield {"answer": partial_answer, "reference": results}
+        except Exception as e:
+            logger.error(f"Failed to generate answer: {e}")
+            yield {"answer": None, "reference": None}
 
     def get_status(self) -> str:
         """get status of service

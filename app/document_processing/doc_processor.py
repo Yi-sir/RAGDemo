@@ -96,7 +96,7 @@ class DocProcessor:
             logger.error(f"Invalid chunk id, filename: {file_name}, chunk_id: {id}")
             raise IndexError()
         return self.doc_chunk_map[file_name][id]
-    
+
     def process_document(self, file_path: str):
         """process document and add to database
 
@@ -152,7 +152,7 @@ class DocProcessor:
             List[str]: list of document name
         """
         return list(self.doc_chunk_map.keys())
-    
+
     def update_topk(self, topk: int):
         """update topk param while retrieval
 

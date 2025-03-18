@@ -17,6 +17,7 @@ class GeneratorApi(Generator):
             api_key = config.api_key
         self.client = openai.OpenAI(api_key=api_key, base_url=config.api_url)
         logger.info(f"GeneratorAPI initialized, api_url: {config.api_url}")
+        self._stream_support = True
 
     def generate(self, prompt: str, **kwargs) -> str:
         # generation_config = {**self.config, **kwargs}
@@ -26,19 +27,20 @@ class GeneratorApi(Generator):
                 {"role": "system", "content": "你是LLM智能助手"},
                 {"role": "user", "content": prompt},
             ],
+            max_tokens=1024,
         )
 
         return response.choices[0].message.content
 
     def generate_stream(self, prompt: str, **kwargs) -> str:
-        # generation_config = {**self.config, **kwargs}
         stream = self.client.chat.completions.create(
             model=self.model_name,
             messages=[
                 {"role": "system", "content": "你是LLM智能助手"},
                 {"role": "user", "content": prompt},
             ],
-            stream=True
+            stream=True,
+            max_tokens=1024,
         )
 
         return stream

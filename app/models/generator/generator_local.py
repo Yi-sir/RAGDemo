@@ -30,6 +30,7 @@ class GeneratorLocal(Generator):
             logger.info(
                 "No available local generation framework, please use GeneratorApi"
             )
+        self._stream_support = False
 
     def _init_vllm(self):
         """init vllm backend if vllm is available
@@ -118,6 +119,21 @@ class GeneratorLocal(Generator):
             return self._generate_vllm(prompt, kwargs)
         elif self.backend == "transformers":
             return self._generate_transformers(prompt, kwargs)
+
+    def generate_stream(self, prompt: str, **kwargs):
+        """generate answer with prompt and kwargs in stream
+
+        Args:
+            prompt (str): input question
+
+        Returns:
+            generator
+        """
+        # if self.backend == "vllm":
+        #     return self._generate_vllm(prompt, kwargs)
+        # elif self.backend == "transformers":
+        #     return self._generate_transformers(prompt, kwargs)
+        pass
 
 
 Generator.register_subclass("LOCAL", GeneratorLocal)

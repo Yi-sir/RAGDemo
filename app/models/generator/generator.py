@@ -21,10 +21,11 @@ logger = get_logger(__name__)
 class Generator(ABC):
 
     def __init__(self, config: GeneratorConfig = None):
-        """
-        init generator
-        :param model_name: such as "gpt-3.5-turbo" or "llama-2-13b"
-        :param config: GeneratorConfig from Engine
+        """init generator
+
+        Args:
+            model_name: such as "gpt-3.5-turbo" or "llama-2-13b"
+            config: GeneratorConfig from Engine
         """
         self.model_name = config.model
         self.config = config
@@ -46,13 +47,37 @@ class Generator(ABC):
 
     @abstractmethod
     def generate(self, prompt: str, **kwargs) -> str:
-        """
-        Call llm for generation
-        :param prompt: input prompt
-        :param kwargs: other params, such as temperature and max_tokens
-        :return: output text
+        """Call llm for generation
+
+        Args:
+            prompt: input prompt
+            kwargs: other params, such as temperature and max_tokens
+
+        Returns:
+            return: output text
         """
         raise NotImplementedError("generate must be implemented in subclasses.")
+
+    def check_query_stream_support(self):
+        """check if llm backend supports generate stream
+
+        Returns:
+            bool: support or not
+        """
+        return self._stream_support
+
+    @abstractmethod
+    def generate_stream(self, prompt: str):
+        """Call llm for generation in stream
+
+        Args:
+            prompt: input prompt
+            kwargs: other params, such as temperature and max_tokens
+
+        Returns:
+            return: output generator
+        """
+        raise NotImplementedError("generate stream must be implemented in subclasses.")
 
     def __call__(self, prompt: str, **kwargs) -> str:
         return self.generate(prompt, **kwargs)
