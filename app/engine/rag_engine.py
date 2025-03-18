@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from app.document_processing.doc_processor import DocProcessor
 from app.engine.config import RAGConfig
@@ -14,8 +14,8 @@ class RAGEngine:
         self.generator = Generator.from_config(config.llm_config)
         self.doc_processor = DocProcessor(config.doc_config)
         logger.info(f"RAGEngine is initialized with config {config}")
-
-    def add_doc(self, file_path: str) -> bool:
+        
+    def _add_single_file(self, file_path: str) -> bool:
         """add a document to rag system
 
         Args:
@@ -24,7 +24,6 @@ class RAGEngine:
         Returns:
             whether is successfully added
         """
-        # TODO: 是不是要支持一下List提交？
         real_path = os.path.abspath(file_path)
         logger.info(f"Add document: {real_path}")
         try:
@@ -34,6 +33,26 @@ class RAGEngine:
         except:
             logger.error(f"Failed to add document: {real_path}")
             return False
+
+
+    def add_doc(self, file_path: Union[str, List[str]]) -> bool:
+        """add a document or a list of documents to rag system
+
+        Args:
+            file_path (Union[str, List[str]]): file path(s)
+
+        Returns:
+            whether is successfully added
+        """
+        if isinstance(file_path, str):
+            return self._add_single_file(file_path)
+        elif isinstance(file_path, List[str]):
+            for file in file_path:
+                ret = self._add_single_file(file)
+                if not ret:
+                    return False
+            return True
+            
 
     def remove_doc(self, file_path: str) -> bool:
         """remove a document from rag system

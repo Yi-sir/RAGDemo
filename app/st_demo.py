@@ -70,18 +70,21 @@ if __name__ == "__main__":
 
     st.header("选择文档")
     uploaded_file = st.file_uploader(
-        "选择一个文档（支持 PDF、DOCX、TXT 等格式）", type=["pdf", "docx", "txt", "md"]
+        "选择一个文档（支持 PDF、DOCX、TXT 等格式）",
+        type=["pdf", "docx", "txt", "md"],
+        accept_multiple_files=True
     )
     submitted = st.button("上传")
     if uploaded_file is not None and submitted:
-        file_path = f"/tmp/{uploaded_file.name}"
-        with open(file_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
+        for file in uploaded_file:
+            file_path = f"/tmp/{file.name}"
+            with open(file_path, "wb") as f:
+                f.write(file.getbuffer())
 
-        if st.session_state.rag_engine.add_doc(file_path):
-            st.success(f"文档 '{uploaded_file.name}' 添加成功！")
-        else:
-            st.error(f"文档 '{uploaded_file.name}' 添加失败！")
+            if st.session_state.rag_engine.add_doc(file_path):
+                st.success(f"文档 '{file.name}' 添加成功！")
+            else:
+                st.error(f"文档 '{file.name}' 添加失败！")
 
     st.header("问答")
     if "messages" not in st.session_state:
@@ -105,9 +108,10 @@ if __name__ == "__main__":
         st.header("删除文档")
         document_list = st.session_state.rag_engine.get_doc_list()
         if document_list:
-            selected_document = st.selectbox("选择要删除的文档", document_list)
+            doc_list_remove_prefix = [doc[5:] for doc in document_list] # remove /tmp/
+            selected_document = st.selectbox("选择要删除的文档", doc_list_remove_prefix)
             if st.button("删除"):
-                if st.session_state.rag_engine.remove_doc(selected_document):
+                if st.session_state.rag_engine.remove_doc("/tmp/" + selected_document):
                     st.success(f"文档 '{selected_document}' 删除成功！")
                 else:
                     st.error(f"文档 '{selected_document}' 删除失败！")
