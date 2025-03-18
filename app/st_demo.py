@@ -23,7 +23,7 @@ def query(prompt: str):
         if result["reference"]:
             with st.expander("参考文档"):
                 for ref in result["reference"]:
-                    st.info(f"参考文件名: {ref[0]}")
+                    st.info(f"参考文件名: {ref[0][5:]}") # remove /tmp/
                     st.write(f"相关内容: {ref[1]}")
         st.session_state.messages.append(
             {"role": "assistant", "content": result["answer"]}
@@ -48,7 +48,7 @@ def query_stream(prompt: str):
         if full_answer and partial_result["reference"]:
             with st.expander("参考文档"):
                 for ref in partial_result["reference"]:
-                    st.info(f"参考文件名: {ref[0]}")
+                    st.info(f"参考文件名: {ref[0][5:]}") # remove /tmp/
                     st.write(f"相关内容: {ref[1]}")
         st.session_state.messages.append({"role": "assistant", "content": full_answer})
     except Exception as e:
