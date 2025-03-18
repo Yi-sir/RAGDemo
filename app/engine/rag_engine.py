@@ -68,7 +68,7 @@ class RAGEngine:
             # 还有对话历史
             answer = self.generator.generate(
                 context
-                + "以上是检索到的参考文本，请根据检索结果回答以下问题\n"
+                + "以上是检索到的参考文本，请根据你的知识和检索结果回答以下问题\n"
                 + question
             )
             return {"answer": answer, "reference": results}
@@ -96,7 +96,7 @@ class RAGEngine:
             context = "\n".join(context)
             stream = self.generator.generate_stream(
                 context
-                + "以上是检索到的参考文本，请根据检索结果回答以下问题\n"
+                + "以上是检索到的参考文本，请根据你的知识和检索结果回答以下问题\n"
                 + question
             )
             for chunk in stream:
