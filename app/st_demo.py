@@ -23,7 +23,7 @@ def query(prompt: str):
         if result["reference"]:
             with st.expander("参考文档"):
                 for ref in result["reference"]:
-                    st.info(f"参考文件名: {ref[0][5:]}") # remove /tmp/
+                    st.info(f"参考文件名: {ref[0][st.session_state.prefix_len:]}") # remove /tmp/
                     st.write(f"相关内容: {ref[1]}")
         st.session_state.messages.append(
             {"role": "assistant", "content": result["answer"]}
@@ -48,7 +48,7 @@ def query_stream(prompt: str):
         if full_answer and partial_result["reference"]:
             with st.expander("参考文档"):
                 for ref in partial_result["reference"]:
-                    st.info(f"参考文件名: {ref[0][5:]}") # remove /tmp/
+                    st.info(f"参考文件名: {ref[0][st.session_state.prefix_len:]}") # remove /tmp/
                     st.write(f"相关内容: {ref[1]}")
         st.session_state.messages.append({"role": "assistant", "content": full_answer})
     except Exception as e:
@@ -62,22 +62,36 @@ if __name__ == "__main__":
     if "rag_engine" not in st.session_state:
         st.session_state.rag_config = RAGConfig.from_json(RAG_ENGINE_CONFIG_PATH)
         st.session_state.rag_engine = RAGEngine(st.session_state.rag_config)
+        st.session_state.support_docx = st.session_state.rag_engine.check_if_support_docx()
+        if st.session_state.support_docx:
+            st.session_state.file_uploader_str = "选择一个文档（支持 PDF、DOCX、TXT 等格式）"
+            st.session_state.file_uploader_list = ["pdf", "docx", "txt", "md"]
+        else:
+            st.session_state.file_uploader_str = "选择一个文档（支持 PDF、TXT 等格式）"
+            st.session_state.file_uploader_list = ["pdf", "txt", "md"]
         st.session_state.query_func = (
             query_stream
             if st.session_state.rag_engine.check_query_stream_support()
             else query
         )
+        if os.name == "nt":
+            st.session_state.prefix = "D:/"
+            st.session_state.prefix_len = 4
+        elif os.name == "posix":
+            st.session_state.prefix = "/tmp/"
+            st.session_state.prefix_len = 5
+            
 
     st.header("选择文档")
     uploaded_file = st.file_uploader(
-        "选择一个文档（支持 PDF、DOCX、TXT 等格式）",
-        type=["pdf", "docx", "txt", "md"],
+        st.session_state.file_uploader_str,
+        st.session_state.file_uploader_list,
         accept_multiple_files=True
     )
     submitted = st.button("上传")
     if uploaded_file is not None and submitted:
         for file in uploaded_file:
-            file_path = f"/tmp/{file.name}"
+            file_path = f"{st.session_state.prefix}{file.name}"
             with open(file_path, "wb") as f:
                 f.write(file.getbuffer())
 
@@ -108,10 +122,10 @@ if __name__ == "__main__":
         st.header("删除文档")
         document_list = st.session_state.rag_engine.get_doc_list()
         if document_list:
-            doc_list_remove_prefix = [doc[5:] for doc in document_list] # remove /tmp/
+            doc_list_remove_prefix = [doc[st.session_state.prefix_len:] for doc in document_list] # remove /tmp/
             selected_document = st.selectbox("选择要删除的文档", doc_list_remove_prefix)
             if st.button("删除"):
-                if st.session_state.rag_engine.remove_doc("/tmp/" + selected_document):
+                if st.session_state.rag_engine.remove_doc(st.session_state.prefix + selected_document):
                     st.success(f"文档 '{selected_document}' 删除成功！")
                 else:
                     st.error(f"文档 '{selected_document}' 删除失败！")

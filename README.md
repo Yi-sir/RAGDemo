@@ -65,4 +65,5 @@ streamlit run ./app/st_demo.py
 ## 说明
 
 > 对于本地部署`VLLM`、`TGI`等`LLM`框架，本项目通过API调用推理接口的情况：`backend_type`设置为`api`，`api_url`设置为`http://localhost:port/v1`，`api_key`置空即可。
+
 > 本项目依赖`streamlit`搭建前端页面，而`streamlit`对多用户数据实现了隔离，所以理论上可以在云端部署，提供给一定规模的组织使用。

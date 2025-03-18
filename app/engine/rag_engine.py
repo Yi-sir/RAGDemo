@@ -1,7 +1,7 @@
 import os
 from typing import Dict, List, Union
 
-from app.document_processing.doc_processor import DocProcessor
+from app.document_processing.doc_processor import DocProcessor, check_if_support_docx
 from app.engine.config import RAGConfig
 from app.models.generator.generator import Generator
 from app.utils.logger import get_logger
@@ -150,3 +150,6 @@ class RAGEngine:
             topk (int): _description_
         """
         self.doc_processor.update_topk(topk)
+
+    def check_if_support_docx(self) -> bool:
+        return check_if_support_docx()
