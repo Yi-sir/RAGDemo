@@ -62,7 +62,7 @@ if __name__ == "__main__":
     if "rag_engine" not in st.session_state:
         st.session_state.rag_config = RAGConfig.from_json(RAG_ENGINE_CONFIG_PATH)
         st.session_state.rag_engine = RAGEngine(st.session_state.rag_config)
-        query_func = (
+        st.session_state.query_func = (
             query_stream
             if st.session_state.rag_engine.check_query_stream_support()
             else query
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         with st.chat_message("user"):
             st.markdown(prompt)
         with st.chat_message("assistant"):
-            query_func(prompt)
+            st.session_state.query_func(prompt)
 
     with st.sidebar:
         st.header("系统状态")
