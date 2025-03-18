@@ -14,7 +14,7 @@ class GeneratorApi(Generator):
         super().__init__(config)
         api_key = os.environ.get(RAG_GENERATOR_API_KEY_ENVIRON, None)
         if api_key is None:
-            api_key = config.api_key
+            api_key = "api_key" if config.api_key == "" else config.api_key
         self.client = openai.OpenAI(api_key=api_key, base_url=config.api_url)
         logger.info(f"GeneratorAPI initialized, api_url: {config.api_url}")
         self._stream_support = True
