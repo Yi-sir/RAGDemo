@@ -118,6 +118,8 @@ class RAGEngine:
                 + question
             )
             for chunk in stream:
+                if len(chunk.choices) == 0:
+                    continue
                 partial_answer = chunk.choices[0].delta.content
                 if partial_answer is not None:
                     yield {"answer": partial_answer, "reference": results}
