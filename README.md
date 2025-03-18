@@ -7,6 +7,7 @@
 * 支持`API`调用或本地调用大模型
 * 本地调用大模型支持`vllm`或`transformers`库
 * 支持多用户访问
+* 测试已支持`windows`和类`ubuntu`操作系统，`macos`未测试因为我没有
 
 更多功能持续开发中，欢迎一起建设！
 
@@ -67,3 +68,5 @@ streamlit run ./app/st_demo.py
 > 对于本地部署`VLLM`、`TGI`等`LLM`框架，本项目通过API调用推理接口的情况：`backend_type`设置为`api`，`api_url`设置为`http://localhost:port/v1`，`api_key`置空即可。
 
 > 本项目依赖`streamlit`搭建前端页面，而`streamlit`对多用户数据实现了隔离，所以理论上可以在云端部署，提供给一定规模的组织使用。
+
+> 对于`windows`操作系统，临时文件保存在`D:/`目录下；对于`ubuntu`操作系统，临时文件保存在`/tmp/`目录下。请确保对于此目录有读写权限。

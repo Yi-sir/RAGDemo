@@ -1,7 +1,8 @@
 import os
 from typing import Dict, List, Union
 
-from app.document_processing.doc_processor import DocProcessor, check_if_support_docx
+from app.document_processing.doc_processor import (DocProcessor,
+                                                   check_if_support_docx)
 from app.engine.config import RAGConfig
 from app.models.generator.generator import Generator
 from app.utils.logger import get_logger
@@ -14,7 +15,7 @@ class RAGEngine:
         self.generator = Generator.from_config(config.llm_config)
         self.doc_processor = DocProcessor(config.doc_config)
         logger.info(f"RAGEngine is initialized with config {config}")
-        
+
     def _add_single_file(self, file_path: str) -> bool:
         """add a document to rag system
 
@@ -34,7 +35,6 @@ class RAGEngine:
             logger.error(f"Failed to add document: {real_path}")
             return False
 
-
     def add_doc(self, file_path: Union[str, List[str]]) -> bool:
         """add a document or a list of documents to rag system
 
@@ -52,7 +52,6 @@ class RAGEngine:
                 if not ret:
                     return False
             return True
-            
 
     def remove_doc(self, file_path: str) -> bool:
         """remove a document from rag system

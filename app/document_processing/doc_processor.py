@@ -15,14 +15,16 @@ logger = get_logger(__name__)
 
 try:
     from docx import Document  # for DOCX
+
     support_docx = True
 except:
     logger.warning("Module docx is unavailable!")
     support_docx = False
-    
-    
+
+
 def check_if_support_docx() -> bool:
     return support_docx
+
 
 def load_document(file_path: Union[str, Path]) -> str:
     """load and extract file
