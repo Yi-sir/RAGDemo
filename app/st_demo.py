@@ -17,7 +17,11 @@ from app.engine.rag_engine import RAGEngine
 
 
 def query(prompt: str):
-    result = st.session_state.rag_engine.query(prompt)
+    if st.session_state.selected_mode == "问答":
+        result = st.session_state.rag_engine.query(prompt)
+    elif st.session_state.selected_mode == "对话":
+        result = st.session_state.rag_engine.query_chat(prompt)
+
     if result["answer"]:
         st.write(result["answer"])
         if result["reference"]:
@@ -33,9 +37,12 @@ def query(prompt: str):
     else:
         st.error("无法生成答案，请稍后重试。")
 
-
 def query_stream(prompt: str):
-    result_stream = st.session_state.rag_engine.query_stream(prompt)
+    if st.session_state.selected_mode == "问答":
+        result_stream = st.session_state.rag_engine.query_stream(prompt)
+    elif st.session_state.selected_mode == "对话":
+        result_stream = st.session_state.rag_engine.query_chat_stream(prompt)
+
     answer_placeholder = st.empty()
     full_answer = ""
     try:
@@ -125,6 +132,11 @@ if __name__ == "__main__":
         # st.header("系统状态")
         # status = st.session_state.rag_engine.get_status()
         # st.json(status)
+        
+        st.header("模式")
+        mode_list = ["问答", "对话"]
+        st.session_state.selected_mode = st.selectbox("选择工作模式", mode_list)
+        
 
         st.header("删除文档")
         document_list = st.session_state.rag_engine.get_doc_list()

@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional, Tuple
 
 from app.document_processing.doc_processor import (DocProcessor,
                                                    check_if_support_docx)
@@ -15,6 +15,7 @@ class RAGEngine:
         self.generator = Generator.from_config(config.llm_config)
         self.doc_processor = DocProcessor(config.doc_config)
         logger.info(f"RAGEngine is initialized with config {config}")
+        self.chat_history = []
 
     def _add_single_file(self, file_path: str) -> bool:
         """add a document to rag system
@@ -72,7 +73,7 @@ class RAGEngine:
             logger.error(f"Failed to remove document: {real_path}")
             return False
 
-    def query(self, question: str) -> Dict:
+    def query(self, question: str, history: Optional[List[Tuple[str, str]]] = None) -> Dict:
         """generate answer to the question from user
 
         Args:
@@ -80,15 +81,11 @@ class RAGEngine:
         """
         try:
             results = self.doc_processor.search_ralated_chunk(question)
-            context = [tup[1] for tup in results]
-            context = "\n".join(context)
+            prompt = self._make_prompt(question, results, history)
             # 这个接口是不是做成generate(context, question) ?
             # 还有对话历史
-            answer = self.generator.generate(
-                context
-                + "以上是检索到的参考文本，请根据你的知识和检索结果回答以下问题\n"
-                + question
-            )
+            answer = self.generator.generate(prompt)
+            self.chat_history.append((question, answer))
             return {"answer": answer, "reference": results}
         except Exception as e:
             logger.error(f"Failed to generate answer: {e}")
@@ -101,8 +98,28 @@ class RAGEngine:
             bool: support or not
         """
         return self.generator.check_query_stream_support()
+    
+    def _make_prompt(self, question: str, search_results: List[Tuple[str, str]], history: Optional[List[Tuple[str, str]]]=None):
+        """prompt maker
 
-    def query_stream(self, question: str):
+        Args:
+            question (str): user input
+            search_results (List[Tuple[str, str]]): related chunks in uploaded files
+            history (Optional[List[Tuple[str, str]]], optional): chat history. Defaults to None.
+
+        Returns:
+            _type_: prompt for llm input
+        """
+        context = [tup[1] for tup in search_results]
+        context = "\n".join(context)
+        prompt = context + "\n以上是检索到的参考文本\n"
+        if history:
+            prompt += "\n".join(f"Q:{q}\nA:{a}\n" for q, a in history)
+            prompt += "以上是历史对话\n"
+        prompt += f"请根据你的知识和检索结果回答以下问题\nQ:{question}"
+        return prompt
+
+    def query_stream(self, question: str, history: Optional[List[Tuple[str, str]]] = None):
         """generate answer to question from user, in stream mode
 
         Args:
@@ -110,22 +127,34 @@ class RAGEngine:
         """
         try:
             results = self.doc_processor.search_ralated_chunk(question)
-            context = [tup[1] for tup in results]
-            context = "\n".join(context)
-            stream = self.generator.generate_stream(
-                context
-                + "以上是检索到的参考文本，请根据你的知识和检索结果回答以下问题\n"
-                + question
-            )
+            prompt = self._make_prompt(question, results, history)
+            stream = self.generator.generate_stream(prompt)
+            complete_answer = ""
             for chunk in stream:
                 if len(chunk.choices) == 0:
                     continue
                 partial_answer = chunk.choices[0].delta.content
                 if partial_answer is not None:
+                    complete_answer += partial_answer
                     yield {"answer": partial_answer, "reference": results}
+            self.chat_history.append((question, complete_answer))
         except Exception as e:
             logger.error(f"Failed to generate answer: {e}")
             yield {"answer": None, "reference": None}
+
+    def _get_history(self):
+        """get chat history
+        """
+        # TODO: 考虑最大长度？
+        return self.chat_history
+
+    def query_chat(self, question: str):
+        history = self._get_history()
+        return self.query(question, history)
+    
+    def query_chat_stream(self, question: str):
+        history = self._get_history()
+        return self.query_stream(question, history)
 
     def get_status(self) -> str:
         """get status of service
