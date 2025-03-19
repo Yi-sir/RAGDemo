@@ -122,9 +122,9 @@ if __name__ == "__main__":
             st.session_state.query_func(prompt)
 
     with st.sidebar:
-        st.header("系统状态")
-        status = st.session_state.rag_engine.get_status()
-        st.json(status)
+        # st.header("系统状态")
+        # status = st.session_state.rag_engine.get_status()
+        # st.json(status)
 
         st.header("删除文档")
         document_list = st.session_state.rag_engine.get_doc_list()
