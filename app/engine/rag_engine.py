@@ -115,7 +115,7 @@ class RAGEngine:
         prompt = context + "\n以上是检索到的参考文本\n"
         if history:
             prompt += "\n".join(f"Q:{q}\nA:{a}\n" for q, a in history)
-            prompt += "以上是历史对话\n"
+            prompt += "除了参考文本外，以上是历史对话。其中'Q:'后面的是问题，'A:'后面的是答案\n"
         prompt += f"请根据你的知识和检索结果回答以下问题\nQ:{question}"
         return prompt
 
