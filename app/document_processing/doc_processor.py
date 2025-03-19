@@ -115,8 +115,8 @@ class DocProcessor:
             file_path (str): file path
         """
         if file_path in self.doc_chunk_map:
-            logger.error(f"Found file with the same name {file_path}")
-            raise FileExistsError()
+            logger.warning(f"Found file with the same name {file_path}")
+            return
         logger.info(f"Process new file {file_path}")
         text = load_document(file_path)
         text = clean_text(text)
