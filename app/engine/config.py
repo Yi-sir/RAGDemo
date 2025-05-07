@@ -15,7 +15,7 @@ class GeneratorConfig:
 
 @dataclass
 class DocConfig:
-    embedding_model: str
+    backend_type: str
     embedding_model_path: str
     split_method: str
     chunk_length: int
@@ -23,6 +23,9 @@ class DocConfig:
     database_method: str
     dimension: int
     topk: int
+    embedding_model: Optional[str] = None
+    emb_api_url: Optional[str] = None
+    emb_api_key: Optional[str] = None
 
 
 @dataclass
